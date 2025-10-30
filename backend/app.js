@@ -39,10 +39,12 @@ const corsOrigins = (
     process.env.CORS_ORIGIN ||
     "http://localhost:3000"
 )
+
+
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean);
-
+console.log(corsOrigins);
 const allowsAllOrigins = corsOrigins.includes("*");
 
 app.use(

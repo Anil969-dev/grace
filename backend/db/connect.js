@@ -8,6 +8,7 @@ async function connectDB() {
     }
 
     const mongoUri = (process.env.MONGODB_URI || DEFAULT_URI).trim();
+    console.log("Connecting to MongoDB at:", mongoUri);
 
     if (!mongoUri) {
         throw new Error("MONGODB_URI is not configured");
