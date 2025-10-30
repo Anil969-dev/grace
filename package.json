@@ -8,6 +8,7 @@
     "dev:backend": "cd backend && nodemon app.js",
     "dev:frontend": "cd frontend && npm start",
     "test": "echo \"Error: no test specified\" && exit 1"
+    
   },
   "repository": {
     "type": "git",
