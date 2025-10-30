@@ -2,6 +2,7 @@
     "scripts": {
         "start": "node app.js",
         "dev": "nodemon app.js",
+        "build": "echo 'No build step needed for Node.js app'",
         "seed": "node db/seedAll.js",
         "seed-ngos": "node db/seedCompleteNgoData.js",
         "setup-chatbot": "node db/setupChatbot.js"
