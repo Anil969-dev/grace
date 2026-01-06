@@ -91,10 +91,11 @@ const init = (server, options = {}) => {
           //      socket.emit("error", {
           //          message: "Unauthorized socket session",
           //      });
-            if (socket.user && socket.user._id) {
-        socket.join(`user_${socket.user._id}`);
-        console.log(`User ${socket.user._id} joined their private room`);
-            }
+
+   if (!socket.user || !socket.user._id) {
+             socket.join(`user_${socket.user._id}`);
+        console.log(`User ${socket.user._id} joined their private room`)
+            
                 return false;
             }
             return true;
