@@ -32,37 +32,38 @@ const app = express();
 app.set("trust proxy", 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// new added
-app.options("*", cors());
 
-// new added
 const corsOrigins = (
-    process.env.CORS_ORIGINS ||
-    process.env.CLIENT_URL ||
-    process.env.CORS_ORIGIN ||
-    "http://localhost:3000" || https://grace-lf7x.onrender.com
+  process.env.CORS_ORIGINS ||
+  process.env.CLIENT_URL ||
+  process.env.CORS_ORIGIN ||
+  "http://localhost:3000"
 )
+  .split(",")
+  .map(origin => origin.trim())
+  .filter(Boolean);
 
-
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean);
-console.log(corsOrigins);
 const allowsAllOrigins = corsOrigins.includes("*");
 
+console.log("Allowed CORS Origins:", corsOrigins);
+
 app.use(
-    cors({
-        origin: (origin, callback) => {
-            if (!origin || allowsAllOrigins || corsOrigins.includes(origin)) {
-                return callback(null, true);
-            }
-            console.warn(`Blocked CORS request from origin: ${origin}`);
-            return callback(new Error("Not allowed by CORS"));
-        },
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-        credentials: true,
-    })
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowsAllOrigins || corsOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn("Blocked CORS request from:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  })
 );
+
+app.options("*", cors());
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/articles", articleRoutes);
