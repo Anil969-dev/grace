@@ -19,15 +19,14 @@ const init = (server, options = {}) => {
 
     if (!corsConfig.origin) {
         corsConfig.origin = (origin, callback) => {
-            if (
-                !origin ||
-                allowAll ||
-                normalizedOrigins.includes(origin.replace(/\/$/, ""))
-            ) {
-                return callback(null, true);
-            }
-            return callback(new Error("Socket origin not allowed"));
-        };
+    const cleanedOrigin = origin ? origin.replace(/\/$/, "") : "";
+    
+    if (!origin || allowAll || normalizedOrigins.includes(cleanedOrigin)) {
+        return callback(null, true);
+    }
+    console.warn("Blocked Socket Connection from Origin:", origin);
+    return callback(new Error("Socket origin not allowed"));
+};
     }
 
     io = socketIo(server, {
