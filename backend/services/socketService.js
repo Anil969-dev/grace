@@ -33,28 +33,53 @@ const init = (server, options = {}) => {
         cors: corsConfig,
     });
 
+  //  io.use(async (socket, next) => {
+  //      try {
+   //         const token =
+    //            socket.handshake.auth?.token ||
+     //           socket.handshake.query?.token ||
+      //          socket.handshake.headers?.authorization?.replace("Bearer ", "");
+
+       //     if (!token) {
+      //          return next(new Error("Authentication token missing"));
+      //      }
+
+       //     const user = await authService.verifyToken(token);
+      //      if (!user) {
+      //          return next(new Error("Invalid authentication token"));
+      //      }
+
+       //     socket.user = user;
+       //     return next();
+      //  } catch (err) {
+     //       return next(err);
+     //   }
+ //   });
+
     io.use(async (socket, next) => {
-        try {
-            const token =
-                socket.handshake.auth?.token ||
-                socket.handshake.query?.token ||
-                socket.handshake.headers?.authorization?.replace("Bearer ", "");
+    try {
+        const token = socket.handshake.auth?.token || 
+                      socket.handshake.query?.token || 
+                      socket.handshake.headers?.authorization?.replace("Bearer ", "");
 
-            if (!token) {
-                return next(new Error("Authentication token missing"));
-            }
-
-            const user = await authService.verifyToken(token);
-            if (!user) {
-                return next(new Error("Invalid authentication token"));
-            }
-
-            socket.user = user;
-            return next();
-        } catch (err) {
-            return next(err);
+        if (!token) {
+            console.error(`❌ Socket Auth Failed: No token from ${socket.id}`);
+            return next(new Error("Authentication token missing"));
         }
-    });
+
+        const user = await authService.verifyToken(token);
+        if (!user) {
+            console.error(`❌ Socket Auth Failed: Invalid token from ${socket.id}`);
+            return next(new Error("Invalid authentication token"));
+        }
+
+        socket.user = user;
+        return next();
+    } catch (err) {
+        console.error("❌ Socket Middleware Error:", err.message);
+        return next(err);
+    }
+});
 
     io.on("connection", (socket) => {
         const username =
