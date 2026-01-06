@@ -47,9 +47,24 @@ const allowsAllOrigins = corsOrigins.includes("*");
 
 console.log("Allowed CORS Origins:", corsOrigins);
 
+// app.use(
+//  cors({
+//    origin: (origin, callback) => {
+//      if (!origin || allowsAllOrigins || corsOrigins.includes(origin)) {
+  //      callback(null, true);
+//      } else {
+  //      console.warn("Blocked CORS request from:", origin);
+  //      callback(new Error("Not allowed by CORS"));
+  //    }
+ //   },
+//    credentials: true,
+//    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+//  })
+// );
+
 app.use(
   cors({
-    origin: (origin, callback) => {
+     origin: (origin, callback) => {
       if (!origin || allowsAllOrigins || corsOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -58,7 +73,8 @@ app.use(
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // Added OPTIONS
+    allowedHeaders: ["Content-Type", "Authorization"] // Explicitly allow these
   })
 );
 
