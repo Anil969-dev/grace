@@ -125,4 +125,22 @@ async function run() {
     }
 }
 
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+    // Log the error for you to see in Render Dashboard
+    console.error("❌ BACKEND ERROR:", {
+        message: err.message,
+        stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack,
+        origin: req.headers.origin,
+        path: req.path,
+    });
+
+    // Send a clean response to the frontend
+    res.status(err.status || 500).json({
+        success: false,
+        error: err.message || "Internal Server Error",
+    });
+});
+
 run();
