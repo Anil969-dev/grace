@@ -37,7 +37,7 @@ const corsOrigins = (
     process.env.CORS_ORIGINS ||
     process.env.CLIENT_URL ||
     process.env.CORS_ORIGIN ||
-    "http://localhost:3000"
+    "http://localhost:3000" || https://grace-lf7x.onrender.com
 )
 
 
