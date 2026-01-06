@@ -32,7 +32,10 @@ const app = express();
 app.set("trust proxy", 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// new added
+app.options("*", cors());
 
+// new added
 const corsOrigins = (
     process.env.CORS_ORIGINS ||
     process.env.CLIENT_URL ||
