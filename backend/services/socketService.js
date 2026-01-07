@@ -19,67 +19,43 @@ const init = (server, options = {}) => {
 
     if (!corsConfig.origin) {
         corsConfig.origin = (origin, callback) => {
-    const cleanedOrigin = origin ? origin.replace(/\/$/, "") : "";
-    
-    if (!origin || allowAll || normalizedOrigins.includes(cleanedOrigin)) {
-        return callback(null, true);
-    }
-    console.warn("Blocked Socket Connection from Origin:", origin);
-    return callback(new Error("Socket origin not allowed"));
-};
+            if (
+                !origin ||
+                allowAll ||
+                normalizedOrigins.includes(origin.replace(/\/$/, ""))
+            ) {
+                return callback(null, true);
+            }
+            return callback(new Error("Socket origin not allowed"));
+        };
     }
 
     io = socketIo(server, {
         cors: corsConfig,
     });
 
-  //  io.use(async (socket, next) => {
-  //      try {
-   //         const token =
-    //            socket.handshake.auth?.token ||
-     //           socket.handshake.query?.token ||
-      //          socket.handshake.headers?.authorization?.replace("Bearer ", "");
-
-       //     if (!token) {
-      //          return next(new Error("Authentication token missing"));
-      //      }
-
-       //     const user = await authService.verifyToken(token);
-      //      if (!user) {
-      //          return next(new Error("Invalid authentication token"));
-      //      }
-
-       //     socket.user = user;
-       //     return next();
-      //  } catch (err) {
-     //       return next(err);
-     //   }
- //   });
-
     io.use(async (socket, next) => {
-    try {
-        const token = socket.handshake.auth?.token || 
-                      socket.handshake.query?.token || 
-                      socket.handshake.headers?.authorization?.replace("Bearer ", "");
+        try {
+            const token =
+                socket.handshake.auth?.token ||
+                socket.handshake.query?.token ||
+                socket.handshake.headers?.authorization?.replace("Bearer ", "");
 
-        if (!token) {
-            console.error(`❌ Socket Auth Failed: No token from ${socket.id}`);
-            return next(new Error("Authentication token missing"));
+            if (!token) {
+                return next(new Error("Authentication token missing"));
+            }
+
+            const user = await authService.verifyToken(token);
+            if (!user) {
+                return next(new Error("Invalid authentication token"));
+            }
+
+            socket.user = user;
+            return next();
+        } catch (err) {
+            return next(err);
         }
-
-        const user = await authService.verifyToken(token);
-        if (!user) {
-            console.error(`❌ Socket Auth Failed: Invalid token from ${socket.id}`);
-            return next(new Error("Invalid authentication token"));
-        }
-
-        socket.user = user;
-        return next();
-    } catch (err) {
-        console.error("❌ Socket Middleware Error:", err.message);
-        return next(err);
-    }
-});
+    });
 
     io.on("connection", (socket) => {
         const username =
@@ -87,15 +63,10 @@ const init = (server, options = {}) => {
         console.log(`Socket connected: ${username} (${socket.id})`);
 
         const ensureAuthenticated = () => {
-         //   if (!socket.user || !socket.user._id) {
-          //      socket.emit("error", {
-          //          message: "Unauthorized socket session",
-          //      });
-
-   if (!socket.user || !socket.user._id) {
-             socket.join(`user_${socket.user._id}`);
-        console.log(`User ${socket.user._id} joined their private room`)
-            
+            if (!socket.user || !socket.user._id) {
+                socket.emit("error", {
+                    message: "Unauthorized socket session",
+                });
                 return false;
             }
             return true;
